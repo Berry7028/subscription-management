@@ -22,8 +22,8 @@ export function SubscriptionListPanel({
   const { active, archived } = partitionSubscriptionsByStatus(subscriptions)
 
   return (
-    <div className="rounded-xl border border-border/80 bg-card/40 p-4 ring-1 ring-foreground/5">
-      <ItemGroup className="gap-3">
+    <div className="flex h-full min-h-0 flex-col rounded-xl border border-border/80 bg-card/40 p-4 ring-1 ring-foreground/5">
+      <ItemGroup className="min-h-0 flex-1 gap-3 overflow-y-auto overscroll-contain">
         <SectionHeading>利用中</SectionHeading>
         {active.length === 0 ? (
           <p className="text-sm text-muted-foreground">登録がありません</p>

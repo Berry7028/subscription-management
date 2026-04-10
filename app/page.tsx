@@ -12,15 +12,17 @@ export default function Page() {
   return (
     <DashboardLayout>
       <SubscriptionPageHeader />
-      <SubscriptionsMainShell
-        subscriptions={MOCK_SUBSCRIPTIONS}
-        sidebar={
-          <>
-            <MonthlyTotalSummary monthlyTotalJpy={monthlyTotalJpy} />
-            <BillingNoteCard body="学割プランを利用中です。" />
-          </>
-        }
-      />
+      <div className="flex min-h-0 w-full flex-1 flex-col">
+        <SubscriptionsMainShell
+          subscriptions={MOCK_SUBSCRIPTIONS}
+          sidebar={
+            <>
+              <MonthlyTotalSummary monthlyTotalJpy={monthlyTotalJpy} />
+              <BillingNoteCard body="学割プランを利用中です。" />
+            </>
+          }
+        />
+      </div>
     </DashboardLayout>
   )
 }
