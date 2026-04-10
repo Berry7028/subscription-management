@@ -4,7 +4,8 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "1",
     name: "Netflix",
-    amountJpy: 1490,
+    amountJpy: 790,
+    standardMonthlyJpy: 1490,
     billingDayOfMonth: 5,
     siteUrl: "https://www.netflix.com",
     status: "active",
@@ -12,7 +13,8 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "2",
     name: "Spotify",
-    amountJpy: 980,
+    amountJpy: 480,
+    standardMonthlyJpy: 980,
     billingDayOfMonth: 12,
     siteUrl: "https://www.spotify.com",
     status: "active",
@@ -20,7 +22,8 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "3",
     name: "GitHub",
-    amountJpy: 550,
+    amountJpy: 300,
+    standardMonthlyJpy: 550,
     billingDayOfMonth: 28,
     siteUrl: "https://github.com",
     status: "active",

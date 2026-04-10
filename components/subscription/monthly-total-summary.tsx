@@ -8,20 +8,19 @@ import {
 import { formatJpy } from "@/lib/format-currency"
 
 export type MonthlyTotalSummaryProps = {
-  /** Total billed per month in JPY (integer yen). */
-  monthlyTotalJpy: number
-  /** Explains what the total represents (billing context). */
+  /** 実際に毎月請求される合計（学割等反映後） */
+  billedMonthlyJpy: number
   caption?: string
 }
 
 export function MonthlyTotalSummary({
-  monthlyTotalJpy,
-  caption = "この金額は、あなたの月額料金として請求されます。",
+  billedMonthlyJpy,
+  caption = "学割などを反映した、実際に請求される月額の合計です。",
 }: MonthlyTotalSummaryProps) {
   return (
     <Card size="sm" className="shrink-0">
       <CardHeader>
-        <CardTitle>月額合計</CardTitle>
+        <CardTitle>請求される月額</CardTitle>
         <CardDescription className="line-clamp-2">{caption}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -29,7 +28,7 @@ export function MonthlyTotalSummary({
           className="font-heading text-2xl font-semibold tracking-tight tabular-nums md:text-3xl"
           aria-live="polite"
         >
-          {formatJpy(monthlyTotalJpy)}
+          {formatJpy(billedMonthlyJpy)}
         </p>
       </CardContent>
     </Card>

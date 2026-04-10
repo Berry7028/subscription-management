@@ -1,12 +1,16 @@
-import { BillingNoteCard } from "@/components/subscription/billing-note-card"
 import { DashboardLayout } from "@/components/subscription/dashboard-layout"
 import { MonthlyTotalSummary } from "@/components/subscription/monthly-total-summary"
+import { StandardMonthlyEstimateCard } from "@/components/subscription/standard-monthly-estimate-card"
 import { SubscriptionPageHeader } from "@/components/subscription/subscription-page-header"
 import { SubscriptionsMainShell } from "@/components/subscription/subscriptions-main-shell"
 import { MOCK_SUBSCRIPTIONS } from "@/lib/subscription-mock-data"
-import { sumActiveMonthlyJpy } from "@/lib/subscription-utils"
+import {
+  sumActiveMonthlyJpy,
+  sumActiveStandardMonthlyJpy,
+} from "@/lib/subscription-utils"
 
-const monthlyTotalJpy = sumActiveMonthlyJpy(MOCK_SUBSCRIPTIONS)
+const billedMonthlyJpy = sumActiveMonthlyJpy(MOCK_SUBSCRIPTIONS)
+const standardMonthlyJpy = sumActiveStandardMonthlyJpy(MOCK_SUBSCRIPTIONS)
 
 export default function Page() {
   return (
@@ -17,8 +21,10 @@ export default function Page() {
           subscriptions={MOCK_SUBSCRIPTIONS}
           sidebar={
             <>
-              <MonthlyTotalSummary monthlyTotalJpy={monthlyTotalJpy} />
-              <BillingNoteCard body="学割プランを利用中です。" />
+              <MonthlyTotalSummary billedMonthlyJpy={billedMonthlyJpy} />
+              <StandardMonthlyEstimateCard
+                standardMonthlyJpy={standardMonthlyJpy}
+              />
             </>
           }
         />
