@@ -10,7 +10,11 @@ import { SubscriptionListRow } from "./subscription-list-row"
 type SubscriptionListPanelProps = {
   subscriptions: Subscription[]
   onRequestAdd: () => void
-  onSubscriptionStatusChange: (id: string, status: SubscriptionStatus) => void
+  onSubscriptionStatusChange: (
+    id: string,
+    status: SubscriptionStatus
+  ) => void | Promise<void>
+  statusChangePendingId?: string | null
 }
 
 function SectionHeading({ children }: { children: string }) {
@@ -25,6 +29,7 @@ export function SubscriptionListPanel({
   subscriptions,
   onRequestAdd,
   onSubscriptionStatusChange,
+  statusChangePendingId = null,
 }: SubscriptionListPanelProps) {
   const { active, archived } = partitionSubscriptionsByStatus(subscriptions)
 
@@ -52,6 +57,7 @@ export function SubscriptionListPanel({
               key={sub.id}
               subscription={sub}
               onStatusChange={onSubscriptionStatusChange}
+              statusChangePending={statusChangePendingId === sub.id}
             />
           ))
         )}
@@ -65,6 +71,7 @@ export function SubscriptionListPanel({
                 key={sub.id}
                 subscription={sub}
                 onStatusChange={onSubscriptionStatusChange}
+                statusChangePending={statusChangePendingId === sub.id}
               />
             ))}
           </>
