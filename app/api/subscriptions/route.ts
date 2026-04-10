@@ -153,3 +153,40 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: message }, { status: statusCode })
   }
 }
+
+export async function DELETE(request: Request) {
+  const token = await convexAuthNextjsToken()
+  if (!token) {
+    return NextResponse.json({ error: "認証が必要です" }, { status: 401 })
+  }
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "JSON が不正です" }, { status: 400 })
+  }
+  if (typeof body !== "object" || body === null) {
+    return NextResponse.json({ error: "リクエストが不正です" }, { status: 400 })
+  }
+  const o = body as Record<string, unknown>
+  const id = typeof o.id === "string" ? o.id : ""
+  if (!id) {
+    return NextResponse.json({ error: "id が不正です" }, { status: 400 })
+  }
+  try {
+    await fetchMutation(
+      api.subscriptions.remove,
+      { id: id as Id<"subscriptions"> },
+      { token }
+    )
+    return NextResponse.json({ ok: true })
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "削除に失敗しました"
+    const statusCode = message.includes("認証")
+      ? 401
+      : message.includes("見つかりません")
+        ? 404
+        : 400
+    return NextResponse.json({ error: message }, { status: statusCode })
+  }
+}

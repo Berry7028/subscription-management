@@ -14,6 +14,7 @@ import { aggregateActiveSpendByCategory } from "@/lib/subscription-category-spen
 import type { SubscriptionDraft } from "@/lib/subscription-draft"
 import {
   createSubscriptionViaApi,
+  deleteSubscriptionViaApi,
   fetchSubscriptionsFromApi,
   setSubscriptionStatusViaApi,
 } from "@/lib/subscriptions-api-client"
@@ -32,6 +33,7 @@ export function SubscriptionsDashboardClient() {
   const [statusChangePendingId, setStatusChangePendingId] = useState<
     string | null
   >(null)
+  const [deletePendingId, setDeletePendingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) {
@@ -93,6 +95,16 @@ export function SubscriptionsDashboardClient() {
     []
   )
 
+  const handleSubscriptionDelete = useCallback(async (id: string) => {
+    setDeletePendingId(id)
+    try {
+      await deleteSubscriptionViaApi(id)
+      setSubscriptions((prev) => prev.filter((s) => s.id !== id))
+    } finally {
+      setDeletePendingId(null)
+    }
+  }, [])
+
   if (authLoading || loadingList) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
@@ -128,7 +140,9 @@ export function SubscriptionsDashboardClient() {
         subscriptions={subscriptions}
         onRequestAdd={openAdd}
         onSubscriptionStatusChange={handleSubscriptionStatusChange}
+        onSubscriptionDelete={handleSubscriptionDelete}
         statusChangePendingId={statusChangePendingId}
+        deletePendingId={deletePendingId}
         sidebar={
           <>
             <Button

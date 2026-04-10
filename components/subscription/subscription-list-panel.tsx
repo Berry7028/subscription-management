@@ -14,7 +14,9 @@ type SubscriptionListPanelProps = {
     id: string,
     status: SubscriptionStatus
   ) => void | Promise<void>
+  onSubscriptionDelete: (id: string) => void | Promise<void>
   statusChangePendingId?: string | null
+  deletePendingId?: string | null
 }
 
 function SectionHeading({ children }: { children: string }) {
@@ -29,7 +31,9 @@ export function SubscriptionListPanel({
   subscriptions,
   onRequestAdd,
   onSubscriptionStatusChange,
+  onSubscriptionDelete,
   statusChangePendingId = null,
+  deletePendingId = null,
 }: SubscriptionListPanelProps) {
   const { active, archived } = partitionSubscriptionsByStatus(subscriptions)
 
@@ -57,7 +61,9 @@ export function SubscriptionListPanel({
               key={sub.id}
               subscription={sub}
               onStatusChange={onSubscriptionStatusChange}
+              onDelete={onSubscriptionDelete}
               statusChangePending={statusChangePendingId === sub.id}
+              deletePending={deletePendingId === sub.id}
             />
           ))
         )}
@@ -71,7 +77,9 @@ export function SubscriptionListPanel({
                 key={sub.id}
                 subscription={sub}
                 onStatusChange={onSubscriptionStatusChange}
+                onDelete={onSubscriptionDelete}
                 statusChangePending={statusChangePendingId === sub.id}
+                deletePending={deletePendingId === sub.id}
               />
             ))}
           </>

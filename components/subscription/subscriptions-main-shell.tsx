@@ -16,7 +16,9 @@ type SubscriptionsMainShellProps = {
     id: string,
     status: SubscriptionStatus
   ) => void | Promise<void>
+  onSubscriptionDelete: (id: string) => void | Promise<void>
   statusChangePendingId?: string | null
+  deletePendingId?: string | null
 }
 
 export function SubscriptionsMainShell({
@@ -24,7 +26,9 @@ export function SubscriptionsMainShell({
   subscriptions,
   onRequestAdd,
   onSubscriptionStatusChange,
+  onSubscriptionDelete,
   statusChangePendingId = null,
+  deletePendingId = null,
 }: SubscriptionsMainShellProps) {
   return (
     <Tabs
@@ -53,7 +57,9 @@ export function SubscriptionsMainShell({
                 subscriptions={subscriptions}
                 onRequestAdd={onRequestAdd}
                 onSubscriptionStatusChange={onSubscriptionStatusChange}
+                onSubscriptionDelete={onSubscriptionDelete}
                 statusChangePendingId={statusChangePendingId}
+                deletePendingId={deletePendingId}
               />
             </TabsContent>
             <TabsContent
