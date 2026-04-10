@@ -1,19 +1,20 @@
-import { Button } from "@/components/ui/button"
+import { BillingNoteCard } from "@/components/subscription/billing-note-card"
+import { DashboardLayout } from "@/components/subscription/dashboard-layout"
+import { MonthlyTotalSummary } from "@/components/subscription/monthly-total-summary"
+import { SubscriptionPageHeader } from "@/components/subscription/subscription-page-header"
+
+/** Placeholder totals until data layer exists */
+const PREVIEW_MONTHLY_TOTAL_JPY = 100_000
 
 export default function Page() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
+    <DashboardLayout>
+      <SubscriptionPageHeader />
+      <div className="flex flex-col gap-4">
+        <MonthlyTotalSummary monthlyTotalJpy={PREVIEW_MONTHLY_TOTAL_JPY} />
+        <BillingNoteCard body="学割プランを利用中です。" />
       </div>
-    </div>
+    </DashboardLayout>
   )
 }
+ｄ
