@@ -26,15 +26,14 @@ import {
   SUBSCRIPTION_CATEGORY_LABELS,
 } from "@/lib/subscription-categories"
 import {
-  createSubscriptionId,
   parseSubscriptionForm,
+  type SubscriptionDraft,
   type SubscriptionFormErrors,
   type SubscriptionFormInput,
 } from "@/lib/subscription-draft"
 import { cn } from "@/lib/utils"
 import type {
   BillingInterval,
-  Subscription,
   SubscriptionCategoryId,
 } from "@/types/subscription"
 
@@ -60,7 +59,7 @@ const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1)
 type SubscriptionAddDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onAdd: (subscription: Subscription) => void
+  onAdd: (draft: SubscriptionDraft) => void | Promise<void>
 }
 
 export function SubscriptionAddDialog({
@@ -70,16 +69,18 @@ export function SubscriptionAddDialog({
 }: SubscriptionAddDialogProps) {
   const [form, setForm] = useState<SubscriptionFormInput>(emptyForm)
   const [errors, setErrors] = useState<SubscriptionFormErrors>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   function handleOpenChange(next: boolean) {
     if (next) {
       setForm(emptyForm)
       setErrors({})
+      setSubmitError(null)
     }
     onOpenChange(next)
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const result = parseSubscriptionForm(form)
     if (!result.ok) {
@@ -87,8 +88,13 @@ export function SubscriptionAddDialog({
       return
     }
     setErrors({})
-    onAdd({ ...result.draft, id: createSubscriptionId() })
-    handleOpenChange(false)
+    setSubmitError(null)
+    try {
+      await onAdd(result.draft)
+      handleOpenChange(false)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "追加に失敗しました")
+    }
   }
 
   function update<K extends keyof SubscriptionFormInput>(
@@ -119,6 +125,11 @@ export function SubscriptionAddDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {submitError ? (
+            <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {submitError}
+            </p>
+          ) : null}
           <FieldGroup className="gap-4">
             <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="sub-name">サービス名</FieldLabel>
@@ -138,9 +149,7 @@ export function SubscriptionAddDialog({
 
             <Field data-invalid={!!errors.categoryId}>
               <FieldLabel htmlFor="sub-category">カテゴリ</FieldLabel>
-              <FieldDescription>
-                円グラフの分類に使います
-              </FieldDescription>
+              <FieldDescription>円グラフの分類に使います</FieldDescription>
               <FieldContent>
                 <select
                   id="sub-category"

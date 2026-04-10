@@ -1,8 +1,10 @@
 import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
+import { ConvexClientProvider } from "@/components/convex-client-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -28,7 +30,11 @@ export default function RootLayout({
       )}
     >
       <body className="h-svh overflow-hidden">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ConvexAuthNextjsServerProvider>
+          <ConvexClientProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </ConvexClientProvider>
+        </ConvexAuthNextjsServerProvider>
       </body>
     </html>
   )

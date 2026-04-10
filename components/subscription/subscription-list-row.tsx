@@ -18,7 +18,11 @@ import type { Subscription, SubscriptionStatus } from "@/types/subscription"
 
 type SubscriptionListRowProps = {
   subscription: Subscription
-  onStatusChange: (id: string, status: SubscriptionStatus) => void
+  onStatusChange: (
+    id: string,
+    status: SubscriptionStatus
+  ) => void | Promise<void>
+  statusChangePending?: boolean
 }
 
 function billingScheduleLabel(sub: Subscription): string {
@@ -35,6 +39,7 @@ function billingScheduleLabel(sub: Subscription): string {
 export function SubscriptionListRow({
   subscription,
   onStatusChange,
+  statusChangePending = false,
 }: SubscriptionListRowProps) {
   const { id, name, amountJpy, billingInterval, siteUrl, status, categoryId } =
     subscription
@@ -86,9 +91,10 @@ export function SubscriptionListRow({
               variant="outline"
               size="xs"
               className="whitespace-nowrap"
-              onClick={() => onStatusChange(id, "archived")}
+              disabled={statusChangePending}
+              onClick={() => void onStatusChange(id, "archived")}
             >
-              いまは使っていない
+              {statusChangePending ? "更新中…" : "いまは使っていない"}
             </Button>
           ) : (
             <Button
@@ -96,9 +102,10 @@ export function SubscriptionListRow({
               variant="secondary"
               size="xs"
               className="whitespace-nowrap"
-              onClick={() => onStatusChange(id, "active")}
+              disabled={statusChangePending}
+              onClick={() => void onStatusChange(id, "active")}
             >
-              利用中にする
+              {statusChangePending ? "更新中…" : "利用中にする"}
             </Button>
           )}
         </ItemActions>
