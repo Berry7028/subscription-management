@@ -11,11 +11,13 @@ import { SubscriptionListPanel } from "./subscription-list-panel"
 type SubscriptionsMainShellProps = {
   sidebar: ReactNode
   subscriptions: Subscription[]
+  onRequestAdd: () => void
 }
 
 export function SubscriptionsMainShell({
   sidebar,
   subscriptions,
+  onRequestAdd,
 }: SubscriptionsMainShellProps) {
   return (
     <Tabs
@@ -40,7 +42,10 @@ export function SubscriptionsMainShell({
               value="list"
               className="mt-0 flex h-full min-h-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden"
             >
-              <SubscriptionListPanel subscriptions={subscriptions} />
+              <SubscriptionListPanel
+                subscriptions={subscriptions}
+                onRequestAdd={onRequestAdd}
+              />
             </TabsContent>
             <TabsContent
               value="calendar"

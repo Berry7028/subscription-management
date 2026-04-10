@@ -1,3 +1,6 @@
+import { Plus } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { partitionSubscriptionsByStatus } from "@/lib/subscription-utils"
 import type { Subscription } from "@/types/subscription"
@@ -6,6 +9,7 @@ import { SubscriptionListRow } from "./subscription-list-row"
 
 type SubscriptionListPanelProps = {
   subscriptions: Subscription[]
+  onRequestAdd: () => void
 }
 
 function SectionHeading({ children }: { children: string }) {
@@ -18,11 +22,24 @@ function SectionHeading({ children }: { children: string }) {
 
 export function SubscriptionListPanel({
   subscriptions,
+  onRequestAdd,
 }: SubscriptionListPanelProps) {
   const { active, archived } = partitionSubscriptionsByStatus(subscriptions)
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border/80 bg-card/40 p-3 ring-1 ring-foreground/5 sm:p-4">
+      <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
+        <h2 className="text-sm font-medium">サブスク一覧</h2>
+        <Button
+          type="button"
+          size="sm"
+          className="gap-1"
+          onClick={onRequestAdd}
+        >
+          <Plus className="size-3.5" />
+          追加
+        </Button>
+      </div>
       <ItemGroup className="min-h-0 flex-1 gap-2 overflow-hidden">
         <SectionHeading>利用中</SectionHeading>
         {active.length === 0 ? (
