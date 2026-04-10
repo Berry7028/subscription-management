@@ -3,7 +3,7 @@
 import type { ReactNode } from "react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { Subscription } from "@/types/subscription"
+import type { Subscription, SubscriptionStatus } from "@/types/subscription"
 
 import { BillingCalendarPanel } from "./billing-calendar-panel"
 import { SubscriptionListPanel } from "./subscription-list-panel"
@@ -12,12 +12,14 @@ type SubscriptionsMainShellProps = {
   sidebar: ReactNode
   subscriptions: Subscription[]
   onRequestAdd: () => void
+  onSubscriptionStatusChange: (id: string, status: SubscriptionStatus) => void
 }
 
 export function SubscriptionsMainShell({
   sidebar,
   subscriptions,
   onRequestAdd,
+  onSubscriptionStatusChange,
 }: SubscriptionsMainShellProps) {
   return (
     <Tabs
@@ -45,6 +47,7 @@ export function SubscriptionsMainShell({
               <SubscriptionListPanel
                 subscriptions={subscriptions}
                 onRequestAdd={onRequestAdd}
+                onSubscriptionStatusChange={onSubscriptionStatusChange}
               />
             </TabsContent>
             <TabsContent

@@ -12,7 +12,7 @@ import {
   sumActiveMonthlyJpy,
   sumActiveStandardMonthlyJpy,
 } from "@/lib/subscription-utils"
-import type { Subscription } from "@/types/subscription"
+import type { Subscription, SubscriptionStatus } from "@/types/subscription"
 
 type SubscriptionsDashboardClientProps = {
   initialSubscriptions: Subscription[]
@@ -34,6 +34,15 @@ export function SubscriptionsDashboardClient({
     setSubscriptions((prev) => [...prev, subscription])
   }, [])
 
+  const handleSubscriptionStatusChange = useCallback(
+    (id: string, status: SubscriptionStatus) => {
+      setSubscriptions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status } : s))
+      )
+    },
+    []
+  )
+
   return (
     <>
       <SubscriptionAddDialog
@@ -44,6 +53,7 @@ export function SubscriptionsDashboardClient({
       <SubscriptionsMainShell
         subscriptions={subscriptions}
         onRequestAdd={openAdd}
+        onSubscriptionStatusChange={handleSubscriptionStatusChange}
         sidebar={
           <>
             <Button

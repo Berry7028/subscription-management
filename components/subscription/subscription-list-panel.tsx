@@ -3,13 +3,14 @@ import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { partitionSubscriptionsByStatus } from "@/lib/subscription-utils"
-import type { Subscription } from "@/types/subscription"
+import type { Subscription, SubscriptionStatus } from "@/types/subscription"
 
 import { SubscriptionListRow } from "./subscription-list-row"
 
 type SubscriptionListPanelProps = {
   subscriptions: Subscription[]
   onRequestAdd: () => void
+  onSubscriptionStatusChange: (id: string, status: SubscriptionStatus) => void
 }
 
 function SectionHeading({ children }: { children: string }) {
@@ -23,6 +24,7 @@ function SectionHeading({ children }: { children: string }) {
 export function SubscriptionListPanel({
   subscriptions,
   onRequestAdd,
+  onSubscriptionStatusChange,
 }: SubscriptionListPanelProps) {
   const { active, archived } = partitionSubscriptionsByStatus(subscriptions)
 
@@ -46,7 +48,11 @@ export function SubscriptionListPanel({
           <p className="text-sm text-muted-foreground">登録がありません</p>
         ) : (
           active.map((sub) => (
-            <SubscriptionListRow key={sub.id} subscription={sub} />
+            <SubscriptionListRow
+              key={sub.id}
+              subscription={sub}
+              onStatusChange={onSubscriptionStatusChange}
+            />
           ))
         )}
 
@@ -55,7 +61,11 @@ export function SubscriptionListPanel({
             <ItemSeparator />
             <SectionHeading>以前利用していたもの</SectionHeading>
             {archived.map((sub) => (
-              <SubscriptionListRow key={sub.id} subscription={sub} />
+              <SubscriptionListRow
+                key={sub.id}
+                subscription={sub}
+                onStatusChange={onSubscriptionStatusChange}
+              />
             ))}
           </>
         ) : null}
