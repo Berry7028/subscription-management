@@ -113,6 +113,91 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  const token = await convexAuthNextjsToken()
+  if (!token) {
+    return NextResponse.json({ error: "認証が必要です" }, { status: 401 })
+  }
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "JSON が不正です" }, { status: 400 })
+  }
+  if (typeof body !== "object" || body === null) {
+    return NextResponse.json({ error: "リクエストが不正です" }, { status: 400 })
+  }
+  const o = body as Record<string, unknown>
+  const id = typeof o.id === "string" ? o.id : ""
+  const name = typeof o.name === "string" ? o.name : ""
+  const categoryId = typeof o.categoryId === "string" ? o.categoryId : ""
+  const billingInterval =
+    typeof o.billingInterval === "string" ? o.billingInterval : ""
+  const siteUrl = typeof o.siteUrl === "string" ? o.siteUrl : ""
+  const status = typeof o.status === "string" ? o.status : "active"
+
+  if (!id) {
+    return NextResponse.json({ error: "id が不正です" }, { status: 400 })
+  }
+  if (!isSubscriptionCategoryId(categoryId)) {
+    return NextResponse.json({ error: "カテゴリが不正です" }, { status: 400 })
+  }
+  if (!isBillingInterval(billingInterval)) {
+    return NextResponse.json({ error: "請求間隔が不正です" }, { status: 400 })
+  }
+  if (!isStatus(status)) {
+    return NextResponse.json({ error: "状態が不正です" }, { status: 400 })
+  }
+
+  const amountJpy = typeof o.amountJpy === "number" ? o.amountJpy : NaN
+  const billingDayOfMonth =
+    typeof o.billingDayOfMonth === "number" ? o.billingDayOfMonth : NaN
+  const billingMonth = typeof o.billingMonth === "number" ? o.billingMonth : NaN
+  let standardAmountJpy: number | undefined
+  if (o.standardAmountJpy !== undefined && o.standardAmountJpy !== null) {
+    if (typeof o.standardAmountJpy !== "number") {
+      return NextResponse.json({ error: "定価が不正です" }, { status: 400 })
+    }
+    standardAmountJpy = o.standardAmountJpy
+  }
+
+  try {
+    await fetchMutation(
+      api.subscriptions.update,
+      {
+        id: id as Id<"subscriptions">,
+        name,
+        categoryId,
+        billingInterval,
+        amountJpy,
+        standardAmountJpy,
+        billingDayOfMonth,
+        billingMonth,
+        siteUrl,
+        status,
+      },
+      { token }
+    )
+    const rows = await fetchQuery(api.subscriptions.list, {}, { token })
+    const updated = rows.find((r) => r._id === id)
+    if (!updated) {
+      return NextResponse.json(
+        { error: "更新後の取得に失敗しました" },
+        { status: 500 }
+      )
+    }
+    return NextResponse.json(docToSubscription(updated))
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "更新に失敗しました"
+    const statusCode = message.includes("認証")
+      ? 401
+      : message.includes("見つかりません")
+        ? 404
+        : 400
+    return NextResponse.json({ error: message }, { status: statusCode })
+  }
+}
+
 export async function PATCH(request: Request) {
   const token = await convexAuthNextjsToken()
   if (!token) {
