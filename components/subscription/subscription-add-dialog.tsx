@@ -22,13 +22,21 @@ import {
 import { Input } from "@/components/ui/input"
 import { BILLING_INTERVAL_LABELS } from "@/lib/billing-interval"
 import {
+  SUBSCRIPTION_CATEGORY_IDS,
+  SUBSCRIPTION_CATEGORY_LABELS,
+} from "@/lib/subscription-categories"
+import {
   createSubscriptionId,
   parseSubscriptionForm,
   type SubscriptionFormErrors,
   type SubscriptionFormInput,
 } from "@/lib/subscription-draft"
 import { cn } from "@/lib/utils"
-import type { BillingInterval, Subscription } from "@/types/subscription"
+import type {
+  BillingInterval,
+  Subscription,
+  SubscriptionCategoryId,
+} from "@/types/subscription"
 
 const selectClassName = cn(
   "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none",
@@ -38,6 +46,7 @@ const selectClassName = cn(
 
 const emptyForm: SubscriptionFormInput = {
   name: "",
+  categoryId: "other",
   billingInterval: "monthly",
   amountJpy: "",
   standardAmountJpy: "",
@@ -124,6 +133,35 @@ export function SubscriptionAddDialog({
                   aria-invalid={!!errors.name}
                 />
                 <FieldError>{errors.name}</FieldError>
+              </FieldContent>
+            </Field>
+
+            <Field data-invalid={!!errors.categoryId}>
+              <FieldLabel htmlFor="sub-category">カテゴリ</FieldLabel>
+              <FieldDescription>
+                円グラフの分類に使います
+              </FieldDescription>
+              <FieldContent>
+                <select
+                  id="sub-category"
+                  name="categoryId"
+                  className={selectClassName}
+                  value={form.categoryId}
+                  onChange={(e) =>
+                    update(
+                      "categoryId",
+                      e.target.value as SubscriptionCategoryId
+                    )
+                  }
+                  aria-invalid={!!errors.categoryId}
+                >
+                  {SUBSCRIPTION_CATEGORY_IDS.map((id) => (
+                    <option key={id} value={id}>
+                      {SUBSCRIPTION_CATEGORY_LABELS[id]}
+                    </option>
+                  ))}
+                </select>
+                <FieldError>{errors.categoryId}</FieldError>
               </FieldContent>
             </Field>
 

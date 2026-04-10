@@ -1,4 +1,8 @@
+import type { SubscriptionCategoryId } from "@/lib/subscription-categories"
+
 export type SubscriptionStatus = "active" | "archived"
+
+export type { SubscriptionCategoryId }
 
 /** 請求の間隔 */
 export type BillingInterval = "monthly" | "quarterly" | "yearly"
@@ -6,6 +10,8 @@ export type BillingInterval = "monthly" | "quarterly" | "yearly"
 export type Subscription = {
   id: string
   name: string
+  /** 支出の分類（円グラフ・集計用） */
+  categoryId: SubscriptionCategoryId
   billingInterval: BillingInterval
   /**
    * 請求サイクルごとの金額（円）。

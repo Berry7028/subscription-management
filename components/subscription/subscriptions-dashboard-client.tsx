@@ -1,13 +1,15 @@
 "use client"
 
 import { Plus } from "lucide-react"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { MonthlyTotalSummary } from "@/components/subscription/monthly-total-summary"
 import { StandardMonthlyEstimateCard } from "@/components/subscription/standard-monthly-estimate-card"
 import { SubscriptionAddDialog } from "@/components/subscription/subscription-add-dialog"
+import { SubscriptionCategoryChart } from "@/components/subscription/subscription-category-chart"
 import { SubscriptionsMainShell } from "@/components/subscription/subscriptions-main-shell"
+import { aggregateActiveSpendByCategory } from "@/lib/subscription-category-spend"
 import {
   sumActiveMonthlyJpy,
   sumActiveStandardMonthlyJpy,
@@ -29,6 +31,11 @@ export function SubscriptionsDashboardClient({
 
   const billedMonthlyJpy = sumActiveMonthlyJpy(subscriptions)
   const standardMonthlyJpy = sumActiveStandardMonthlyJpy(subscriptions)
+
+  const categorySlices = useMemo(
+    () => aggregateActiveSpendByCategory(subscriptions),
+    [subscriptions]
+  )
 
   const handleAdd = useCallback((subscription: Subscription) => {
     setSubscriptions((prev) => [...prev, subscription])
@@ -65,6 +72,7 @@ export function SubscriptionsDashboardClient({
               <Plus className="size-4" />
               サブスクを追加
             </Button>
+            <SubscriptionCategoryChart slices={categorySlices} />
             <MonthlyTotalSummary billedMonthlyJpy={billedMonthlyJpy} />
             <StandardMonthlyEstimateCard
               standardMonthlyJpy={standardMonthlyJpy}

@@ -13,6 +13,7 @@ import {
   amountToMonthlyEquivalentJpy,
 } from "@/lib/billing-interval"
 import { formatJpy } from "@/lib/format-currency"
+import { getSubscriptionCategoryLabel } from "@/lib/subscription-categories"
 import type { Subscription, SubscriptionStatus } from "@/types/subscription"
 
 type SubscriptionListRowProps = {
@@ -35,8 +36,10 @@ export function SubscriptionListRow({
   subscription,
   onStatusChange,
 }: SubscriptionListRowProps) {
-  const { id, name, amountJpy, billingInterval, siteUrl, status } = subscription
+  const { id, name, amountJpy, billingInterval, siteUrl, status, categoryId } =
+    subscription
 
+  const categoryLabel = getSubscriptionCategoryLabel(categoryId)
   const intervalLabel = BILLING_INTERVAL_LABELS[billingInterval]
   const monthlyEq = amountToMonthlyEquivalentJpy(amountJpy, billingInterval)
   const schedule = billingScheduleLabel(subscription)
@@ -45,7 +48,12 @@ export function SubscriptionListRow({
     <Item variant="outline" size="sm">
       <ItemHeader className="items-start gap-2 sm:items-center sm:gap-3">
         <ItemContent className="min-w-0">
-          <ItemTitle className="text-sm">{name}</ItemTitle>
+          <ItemTitle className="flex flex-wrap items-center gap-1.5 text-sm">
+            <span>{name}</span>
+            <span className="rounded-md bg-muted px-1.5 py-px text-[10px] font-medium text-muted-foreground">
+              {categoryLabel}
+            </span>
+          </ItemTitle>
           <ItemDescription>
             {intervalLabel} {formatJpy(amountJpy)}
             {billingInterval !== "monthly"

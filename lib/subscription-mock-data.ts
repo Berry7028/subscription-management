@@ -4,6 +4,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "1",
     name: "Netflix",
+    categoryId: "streaming",
     billingInterval: "monthly",
     amountJpy: 790,
     standardAmountJpy: 1490,
@@ -15,6 +16,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "2",
     name: "Spotify",
+    categoryId: "music",
     billingInterval: "monthly",
     amountJpy: 480,
     standardAmountJpy: 980,
@@ -26,6 +28,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "3",
     name: "GitHub",
+    categoryId: "dev",
     billingInterval: "monthly",
     amountJpy: 300,
     standardAmountJpy: 550,
@@ -37,6 +40,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "6",
     name: "クラウドバックアップ（年契約）",
+    categoryId: "cloud",
     billingInterval: "yearly",
     amountJpy: 9800,
     standardAmountJpy: 11800,
@@ -48,6 +52,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "7",
     name: "開発ツール（四半期）",
+    categoryId: "dev",
     billingInterval: "quarterly",
     amountJpy: 4500,
     billingDayOfMonth: 15,
@@ -58,6 +63,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "4",
     name: "Adobe CC",
+    categoryId: "productivity",
     billingInterval: "monthly",
     amountJpy: 6780,
     billingDayOfMonth: 15,
@@ -68,6 +74,7 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   {
     id: "5",
     name: "Dropbox",
+    categoryId: "cloud",
     billingInterval: "monthly",
     amountJpy: 1200,
     billingDayOfMonth: 1,

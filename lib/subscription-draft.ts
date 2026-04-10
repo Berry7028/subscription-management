@@ -1,10 +1,16 @@
 import { normalizeBillingMonth } from "@/lib/billing-interval"
-import type { BillingInterval, Subscription } from "@/types/subscription"
+import { isSubscriptionCategoryId } from "@/lib/subscription-categories"
+import type {
+  BillingInterval,
+  Subscription,
+  SubscriptionCategoryId,
+} from "@/types/subscription"
 
 export type SubscriptionDraft = Omit<Subscription, "id">
 
 export type SubscriptionFormInput = {
   name: string
+  categoryId: SubscriptionCategoryId
   billingInterval: BillingInterval
   amountJpy: string
   standardAmountJpy: string
@@ -55,6 +61,13 @@ export function parseSubscriptionForm(
   const name = input.name.trim()
   if (!name) {
     errors.name = "サービス名を入力してください"
+  }
+
+  let categoryId: SubscriptionCategoryId | null = null
+  if (!isSubscriptionCategoryId(input.categoryId)) {
+    errors.categoryId = "カテゴリを選択してください"
+  } else {
+    categoryId = input.categoryId
   }
 
   const billingInterval = parseBillingInterval(input.billingInterval)
@@ -134,6 +147,7 @@ export function parseSubscriptionForm(
     ok: true,
     draft: {
       name,
+      categoryId: categoryId!,
       billingInterval: interval,
       amountJpy,
       standardAmountJpy,
