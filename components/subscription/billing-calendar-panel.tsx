@@ -6,7 +6,7 @@ import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   buildMonthGridCells,
-  effectiveBillingDay,
+  subscriptionBillingTooltip,
   subscriptionsBillingOnDay,
   WEEKDAY_LABELS_JA,
 } from "@/lib/billing-calendar"
@@ -142,7 +142,7 @@ export function BillingCalendarPanel({
                     <li
                       key={sub.id}
                       className="truncate rounded bg-primary/15 px-0.5 text-[10px] leading-tight text-foreground"
-                      title={`${sub.name}（毎月${effectiveBillingDay(year, monthIndex, sub.billingDayOfMonth)}日）`}
+                      title={subscriptionBillingTooltip(sub, year, monthIndex)}
                     >
                       {sub.name}
                     </li>
@@ -160,7 +160,7 @@ export function BillingCalendarPanel({
       </div>
 
       <p className="sr-only">
-        利用中のサブスクリプションのみ表示します。日付はその月の実請求日（月末調整あり）です。
+        利用中のサブスクリプションのみ表示します。四半期・年額は請求が発生する月の日付だけ表示します。日付はその月の実請求日（月末調整あり）です。
       </p>
     </div>
   )

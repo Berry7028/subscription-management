@@ -1,18 +1,23 @@
-import type { Subscription } from "@/types/subscription"
+import { normalizeBillingMonth } from "@/lib/billing-interval"
+import type { BillingInterval, Subscription } from "@/types/subscription"
 
 export type SubscriptionDraft = Omit<Subscription, "id">
 
 export type SubscriptionFormInput = {
   name: string
+  billingInterval: BillingInterval
   amountJpy: string
-  standardMonthlyJpy: string
+  standardAmountJpy: string
   billingDayOfMonth: string
+  billingMonth: string
   siteUrl: string
 }
 
 export type SubscriptionFormErrors = Partial<
   Record<keyof SubscriptionFormInput | "form", string>
 >
+
+const BILLING_INTERVALS: BillingInterval[] = ["monthly", "quarterly", "yearly"]
 
 function normalizeSiteUrl(raw: string): string {
   const t = raw.trim()
@@ -35,6 +40,13 @@ function parseNonNegativeInt(raw: string, label: string): number {
   return n
 }
 
+function parseBillingInterval(raw: string): BillingInterval | null {
+  if (BILLING_INTERVALS.includes(raw as BillingInterval)) {
+    return raw as BillingInterval
+  }
+  return null
+}
+
 export function parseSubscriptionForm(
   input: SubscriptionFormInput
 ): { ok: true; draft: SubscriptionDraft } | { ok: false; errors: SubscriptionFormErrors } {
@@ -43,6 +55,11 @@ export function parseSubscriptionForm(
   const name = input.name.trim()
   if (!name) {
     errors.name = "サービス名を入力してください"
+  }
+
+  const billingInterval = parseBillingInterval(input.billingInterval)
+  if (!billingInterval) {
+    errors.billingInterval = "請求間隔を選択してください"
   }
 
   let amountJpy = 0
@@ -56,25 +73,25 @@ export function parseSubscriptionForm(
     }
   }
 
-  let standardMonthlyJpy: number | undefined
-  const stdRaw = input.standardMonthlyJpy.trim()
+  let standardAmountJpy: number | undefined
+  const stdRaw = input.standardAmountJpy.trim()
   if (stdRaw.length > 0) {
     try {
       const v = parseNonNegativeInt(stdRaw, "standard")
-      standardMonthlyJpy = v
+      standardAmountJpy = v
       if (!errors.amountJpy && v < amountJpy) {
-        errors.standardMonthlyJpy =
+        errors.standardAmountJpy =
           "定価は実請求額以上の金額を入力してください"
       }
     } catch {
-      errors.standardMonthlyJpy = "0以上の半角整数で入力してください"
+      errors.standardAmountJpy = "0以上の半角整数で入力してください"
     }
   }
 
   let billingDayOfMonth = 0
   const dayRaw = input.billingDayOfMonth.trim()
   if (!dayRaw) {
-    errors.billingDayOfMonth = "請求日を入力してください"
+    errors.billingDayOfMonth = "請求日（日）を入力してください"
   } else {
     billingDayOfMonth = Number.parseInt(dayRaw, 10)
     if (
@@ -83,6 +100,19 @@ export function parseSubscriptionForm(
       billingDayOfMonth > 31
     ) {
       errors.billingDayOfMonth = "1〜31の整数で入力してください"
+    }
+  }
+
+  let billingMonth = 1
+  if (billingInterval && billingInterval !== "monthly") {
+    const bmRaw = input.billingMonth.trim()
+    if (!bmRaw) {
+      errors.billingMonth = "請求月を選択してください"
+    } else {
+      billingMonth = Number.parseInt(bmRaw, 10)
+      if (!Number.isInteger(billingMonth) || billingMonth < 1 || billingMonth > 12) {
+        errors.billingMonth = "1〜12の整数で入力してください"
+      }
     }
   }
 
@@ -97,13 +127,18 @@ export function parseSubscriptionForm(
     return { ok: false, errors }
   }
 
+  const interval = billingInterval!
+  const month = normalizeBillingMonth(interval, billingMonth)
+
   return {
     ok: true,
     draft: {
       name,
+      billingInterval: interval,
       amountJpy,
-      standardMonthlyJpy,
+      standardAmountJpy,
       billingDayOfMonth,
+      billingMonth: month,
       siteUrl,
       status: "active",
     },

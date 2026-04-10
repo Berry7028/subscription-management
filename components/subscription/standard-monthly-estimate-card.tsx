@@ -15,7 +15,7 @@ export type StandardMonthlyEstimateCardProps = {
 
 export function StandardMonthlyEstimateCard({
   standardMonthlyJpy,
-  caption = "学割が適用されない場合の想定です。現在この金額は請求されません。",
+  caption = "学割が適用されない場合の想定です。年額・四半期は月あたり換算で合算しています。現在この金額は請求されません。",
 }: StandardMonthlyEstimateCardProps) {
   return (
     <Card size="sm" className="shrink-0 border-dashed">

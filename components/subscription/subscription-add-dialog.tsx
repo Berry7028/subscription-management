@@ -20,21 +20,33 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { BILLING_INTERVAL_LABELS } from "@/lib/billing-interval"
 import {
   createSubscriptionId,
   parseSubscriptionForm,
   type SubscriptionFormErrors,
   type SubscriptionFormInput,
 } from "@/lib/subscription-draft"
-import type { Subscription } from "@/types/subscription"
+import { cn } from "@/lib/utils"
+import type { BillingInterval, Subscription } from "@/types/subscription"
+
+const selectClassName = cn(
+  "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none",
+  "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm",
+  "dark:bg-input/30"
+)
 
 const emptyForm: SubscriptionFormInput = {
   name: "",
+  billingInterval: "monthly",
   amountJpy: "",
-  standardMonthlyJpy: "",
+  standardAmountJpy: "",
   billingDayOfMonth: "",
+  billingMonth: "1",
   siteUrl: "",
 }
+
+const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1)
 
 type SubscriptionAddDialogProps = {
   open: boolean
@@ -85,6 +97,8 @@ export function SubscriptionAddDialog({
     })
   }
 
+  const showBillingMonth = form.billingInterval !== "monthly"
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md" showCloseButton>
@@ -113,10 +127,40 @@ export function SubscriptionAddDialog({
               </FieldContent>
             </Field>
 
-            <Field data-invalid={!!errors.amountJpy}>
-              <FieldLabel htmlFor="sub-amount">請求される月額（円）</FieldLabel>
+            <Field data-invalid={!!errors.billingInterval}>
+              <FieldLabel htmlFor="sub-interval">請求の間隔</FieldLabel>
               <FieldDescription>
-                学割・割引適用後の実際の請求額
+                金額は、その間隔ごとの合計（例: 年額なら12か月分まとめて）
+              </FieldDescription>
+              <FieldContent>
+                <select
+                  id="sub-interval"
+                  name="billingInterval"
+                  className={selectClassName}
+                  value={form.billingInterval}
+                  onChange={(e) =>
+                    update("billingInterval", e.target.value as BillingInterval)
+                  }
+                  aria-invalid={!!errors.billingInterval}
+                >
+                  {(
+                    Object.keys(BILLING_INTERVAL_LABELS) as BillingInterval[]
+                  ).map((key) => (
+                    <option key={key} value={key}>
+                      {BILLING_INTERVAL_LABELS[key]}
+                    </option>
+                  ))}
+                </select>
+                <FieldError>{errors.billingInterval}</FieldError>
+              </FieldContent>
+            </Field>
+
+            <Field data-invalid={!!errors.amountJpy}>
+              <FieldLabel htmlFor="sub-amount">
+                請求額（円・上記の間隔ごと）
+              </FieldLabel>
+              <FieldDescription>
+                学割・割引適用後の、1サイクルあたりの実請求額
               </FieldDescription>
               <FieldContent>
                 <Input
@@ -132,31 +176,63 @@ export function SubscriptionAddDialog({
               </FieldContent>
             </Field>
 
-            <Field data-invalid={!!errors.standardMonthlyJpy}>
+            <Field data-invalid={!!errors.standardAmountJpy}>
               <FieldLabel htmlFor="sub-standard">
-                定価・学割なしの月額（円）
+                定価（円・同じ間隔単位）
               </FieldLabel>
               <FieldDescription>
-                任意。空欄の場合は上記と同じとみなします
+                任意。空欄の場合は請求額と同じとみなします
               </FieldDescription>
               <FieldContent>
                 <Input
                   id="sub-standard"
-                  name="standardMonthlyJpy"
+                  name="standardAmountJpy"
                   inputMode="numeric"
                   placeholder="空欄可"
-                  value={form.standardMonthlyJpy}
-                  onChange={(e) => update("standardMonthlyJpy", e.target.value)}
-                  aria-invalid={!!errors.standardMonthlyJpy}
+                  value={form.standardAmountJpy}
+                  onChange={(e) => update("standardAmountJpy", e.target.value)}
+                  aria-invalid={!!errors.standardAmountJpy}
                 />
-                <FieldError>{errors.standardMonthlyJpy}</FieldError>
+                <FieldError>{errors.standardAmountJpy}</FieldError>
               </FieldContent>
             </Field>
 
+            {showBillingMonth ? (
+              <Field data-invalid={!!errors.billingMonth}>
+                <FieldLabel htmlFor="sub-billing-month">
+                  {form.billingInterval === "yearly"
+                    ? "請求が来る月"
+                    : "四半期の起点となる月"}
+                </FieldLabel>
+                <FieldDescription>
+                  {form.billingInterval === "yearly"
+                    ? "この月に年1回まとめて請求されます"
+                    : "この月から3か月ごとに請求されます（例: 2月なら 2・5・8・11月）"}
+                </FieldDescription>
+                <FieldContent>
+                  <select
+                    id="sub-billing-month"
+                    name="billingMonth"
+                    className={selectClassName}
+                    value={form.billingMonth}
+                    onChange={(e) => update("billingMonth", e.target.value)}
+                    aria-invalid={!!errors.billingMonth}
+                  >
+                    {MONTH_OPTIONS.map((m) => (
+                      <option key={m} value={String(m)}>
+                        {m}月
+                      </option>
+                    ))}
+                  </select>
+                  <FieldError>{errors.billingMonth}</FieldError>
+                </FieldContent>
+              </Field>
+            ) : null}
+
             <Field data-invalid={!!errors.billingDayOfMonth}>
-              <FieldLabel htmlFor="sub-day">請求日（毎月）</FieldLabel>
+              <FieldLabel htmlFor="sub-day">請求日（日にち）</FieldLabel>
               <FieldDescription>
-                1〜31（その月に日がない場合は月末）
+                1〜31。請求が発生する月で、その月の何日に引き落としがあるか
               </FieldDescription>
               <FieldContent>
                 <Input

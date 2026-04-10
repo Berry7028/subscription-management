@@ -1,3 +1,7 @@
+import {
+  BILLING_INTERVAL_LABELS,
+  isBillingCalendarMonth,
+} from "@/lib/billing-interval"
 import type { Subscription } from "@/types/subscription"
 
 export function getDaysInMonth(year: number, monthIndex: number): number {
@@ -17,16 +21,50 @@ export function effectiveBillingDay(
   return Math.min(Math.max(1, billingDayOfMonth), dim)
 }
 
+export function subscriptionBillsOnCalendarDay(
+  sub: Subscription,
+  year: number,
+  monthIndex: number,
+  calendarDay: number
+): boolean {
+  if (
+    !isBillingCalendarMonth(
+      sub.billingInterval,
+      sub.billingMonth,
+      monthIndex
+    )
+  ) {
+    return false
+  }
+  const day = effectiveBillingDay(year, monthIndex, sub.billingDayOfMonth)
+  return day === calendarDay
+}
+
 export function subscriptionsBillingOnDay(
   subscriptions: Subscription[],
   year: number,
   monthIndex: number,
   calendarDay: number
 ): Subscription[] {
-  return subscriptions.filter((sub) => {
-    const day = effectiveBillingDay(year, monthIndex, sub.billingDayOfMonth)
-    return day === calendarDay
-  })
+  return subscriptions.filter((sub) =>
+    subscriptionBillsOnCalendarDay(sub, year, monthIndex, calendarDay)
+  )
+}
+
+export function subscriptionBillingTooltip(
+  sub: Subscription,
+  year: number,
+  monthIndex: number
+): string {
+  const day = effectiveBillingDay(year, monthIndex, sub.billingDayOfMonth)
+  const label = BILLING_INTERVAL_LABELS[sub.billingInterval]
+  if (sub.billingInterval === "monthly") {
+    return `${sub.name}（${label}・${day}日）`
+  }
+  if (sub.billingInterval === "yearly") {
+    return `${sub.name}（${label}・${sub.billingMonth}月${day}日）`
+  }
+  return `${sub.name}（${label}・起点${sub.billingMonth}月・${day}日）`
 }
 
 export const WEEKDAY_LABELS_JA = ["日", "月", "火", "水", "木", "金", "土"] as const

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import {
   Item,
   ItemActions,
@@ -6,7 +7,11 @@ import {
   ItemHeader,
   ItemTitle,
 } from "@/components/ui/item"
-import { Button } from "@/components/ui/button"
+import {
+  BILLING_INTERVAL_LABELS,
+  BILLING_INTERVAL_UNIT_SHORT,
+  amountToMonthlyEquivalentJpy,
+} from "@/lib/billing-interval"
 import { formatJpy } from "@/lib/format-currency"
 import type { Subscription, SubscriptionStatus } from "@/types/subscription"
 
@@ -15,12 +20,26 @@ type SubscriptionListRowProps = {
   onStatusChange: (id: string, status: SubscriptionStatus) => void
 }
 
+function billingScheduleLabel(sub: Subscription): string {
+  const { billingInterval, billingDayOfMonth, billingMonth } = sub
+  if (billingInterval === "monthly") {
+    return `毎月${billingDayOfMonth}日`
+  }
+  if (billingInterval === "yearly") {
+    return `年1回 ${billingMonth}月${billingDayOfMonth}日`
+  }
+  return `四半期（起点${billingMonth}月） 各${billingDayOfMonth}日`
+}
+
 export function SubscriptionListRow({
   subscription,
   onStatusChange,
 }: SubscriptionListRowProps) {
-  const { id, name, amountJpy, billingDayOfMonth, siteUrl, status } =
-    subscription
+  const { id, name, amountJpy, billingInterval, siteUrl, status } = subscription
+
+  const intervalLabel = BILLING_INTERVAL_LABELS[billingInterval]
+  const monthlyEq = amountToMonthlyEquivalentJpy(amountJpy, billingInterval)
+  const schedule = billingScheduleLabel(subscription)
 
   return (
     <Item variant="outline" size="sm">
@@ -28,7 +47,12 @@ export function SubscriptionListRow({
         <ItemContent className="min-w-0">
           <ItemTitle className="text-sm">{name}</ItemTitle>
           <ItemDescription>
-            請求日: 毎月{billingDayOfMonth}日
+            {intervalLabel} {formatJpy(amountJpy)}
+            {billingInterval !== "monthly"
+              ? `（月換算 約${formatJpy(monthlyEq)}）`
+              : null}
+            <br />
+            {schedule}
             {status === "archived" ? " · いまは使っていない" : null}
             {" · "}
             <a
@@ -44,6 +68,9 @@ export function SubscriptionListRow({
         <ItemActions className="shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-2">
           <span className="text-sm font-semibold tabular-nums sm:text-base">
             {formatJpy(amountJpy)}
+            <span className="block text-[10px] font-normal text-muted-foreground sm:ml-1 sm:inline sm:text-xs">
+              /{BILLING_INTERVAL_UNIT_SHORT[billingInterval]}
+            </span>
           </span>
           {status === "active" ? (
             <Button

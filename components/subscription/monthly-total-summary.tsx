@@ -15,7 +15,7 @@ export type MonthlyTotalSummaryProps = {
 
 export function MonthlyTotalSummary({
   billedMonthlyJpy,
-  caption = "学割などを反映した、実際に請求される月額の合計です。",
+  caption = "年額・四半期は月あたりに換算して合算しています。学割など反映後の実質負担の目安です。",
 }: MonthlyTotalSummaryProps) {
   return (
     <Card size="sm" className="shrink-0">
