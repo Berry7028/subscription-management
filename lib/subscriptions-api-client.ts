@@ -36,6 +36,30 @@ export async function fetchSubscriptionsFromApi(): Promise<Subscription[]> {
   return data as Subscription[]
 }
 
+export async function updateSubscriptionViaApi(
+  id: string,
+  draft: SubscriptionDraft
+): Promise<Subscription> {
+  const res = await fetch("/api/subscriptions", {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, ...draft }),
+  })
+  const data = await parseJsonResponse(res)
+  if (!res.ok) {
+    const msg =
+      typeof data === "object" &&
+      data !== null &&
+      "error" in data &&
+      typeof (data as { error: unknown }).error === "string"
+        ? (data as { error: string }).error
+        : "更新に失敗しました"
+    throw new Error(msg)
+  }
+  return data as Subscription
+}
+
 export async function createSubscriptionViaApi(
   draft: SubscriptionDraft
 ): Promise<Subscription> {

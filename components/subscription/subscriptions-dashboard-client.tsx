@@ -17,6 +17,7 @@ import {
   deleteSubscriptionViaApi,
   fetchSubscriptionsFromApi,
   setSubscriptionStatusViaApi,
+  updateSubscriptionViaApi,
 } from "@/lib/subscriptions-api-client"
 import {
   sumActiveMonthlyJpy,
@@ -29,7 +30,8 @@ export function SubscriptionsDashboardClient() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
   const [loadingList, setLoadingList] = useState(true)
-  const [addOpen, setAddOpen] = useState(false)
+  const [formOpen, setFormOpen] = useState(false)
+  const [formInitial, setFormInitial] = useState<Subscription | null>(null)
   const [statusChangePendingId, setStatusChangePendingId] = useState<
     string | null
   >(null)
@@ -65,7 +67,22 @@ export function SubscriptionsDashboardClient() {
     }
   }, [authLoading, isAuthenticated])
 
-  const openAdd = useCallback(() => setAddOpen(true), [])
+  const openAdd = useCallback(() => {
+    setFormInitial(null)
+    setFormOpen(true)
+  }, [])
+
+  const openEdit = useCallback((sub: Subscription) => {
+    setFormInitial(sub)
+    setFormOpen(true)
+  }, [])
+
+  const handleFormOpenChange = useCallback((open: boolean) => {
+    setFormOpen(open)
+    if (!open) {
+      setFormInitial(null)
+    }
+  }, [])
 
   const billedMonthlyJpy = sumActiveMonthlyJpy(subscriptions)
   const standardMonthlyJpy = sumActiveStandardMonthlyJpy(subscriptions)
@@ -75,10 +92,20 @@ export function SubscriptionsDashboardClient() {
     [subscriptions]
   )
 
-  const handleAdd = useCallback(async (draft: SubscriptionDraft) => {
-    const created = await createSubscriptionViaApi(draft)
-    setSubscriptions((prev) => [...prev, created])
-  }, [])
+  const handleSaveSubscription = useCallback(
+    async (draft: SubscriptionDraft, existingId: string | null) => {
+      if (existingId) {
+        const updated = await updateSubscriptionViaApi(existingId, draft)
+        setSubscriptions((prev) =>
+          prev.map((s) => (s.id === existingId ? updated : s))
+        )
+        return
+      }
+      const created = await createSubscriptionViaApi(draft)
+      setSubscriptions((prev) => [...prev, created])
+    },
+    []
+  )
 
   const handleSubscriptionStatusChange = useCallback(
     async (id: string, status: SubscriptionStatus) => {
@@ -132,13 +159,15 @@ export function SubscriptionsDashboardClient() {
   return (
     <>
       <SubscriptionAddDialog
-        open={addOpen}
-        onOpenChange={setAddOpen}
-        onAdd={handleAdd}
+        open={formOpen}
+        onOpenChange={handleFormOpenChange}
+        initialSubscription={formInitial}
+        onSave={handleSaveSubscription}
       />
       <SubscriptionsMainShell
         subscriptions={subscriptions}
         onRequestAdd={openAdd}
+        onRequestEdit={openEdit}
         onSubscriptionStatusChange={handleSubscriptionStatusChange}
         onSubscriptionDelete={handleSubscriptionDelete}
         statusChangePendingId={statusChangePendingId}

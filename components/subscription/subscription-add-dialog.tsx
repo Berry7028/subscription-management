@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -27,6 +27,7 @@ import {
 } from "@/lib/subscription-categories"
 import {
   parseSubscriptionForm,
+  subscriptionToFormInput,
   type SubscriptionDraft,
   type SubscriptionFormErrors,
   type SubscriptionFormInput,
@@ -34,6 +35,7 @@ import {
 import { cn } from "@/lib/utils"
 import type {
   BillingInterval,
+  Subscription,
   SubscriptionCategoryId,
 } from "@/types/subscription"
 
@@ -59,41 +61,69 @@ const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1)
 type SubscriptionAddDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onAdd: (draft: SubscriptionDraft) => void | Promise<void>
+  /** null のときは新規追加、指定時はその内容で編集 */
+  initialSubscription: Subscription | null
+  onSave: (
+    draft: SubscriptionDraft,
+    existingId: string | null
+  ) => void | Promise<void>
 }
 
 export function SubscriptionAddDialog({
   open,
   onOpenChange,
-  onAdd,
+  initialSubscription,
+  onSave,
 }: SubscriptionAddDialogProps) {
   const [form, setForm] = useState<SubscriptionFormInput>(emptyForm)
   const [errors, setErrors] = useState<SubscriptionFormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  const isEdit = initialSubscription !== null
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+    setForm(
+      initialSubscription
+        ? subscriptionToFormInput(initialSubscription)
+        : emptyForm
+    )
+    setErrors({})
+    setSubmitError(null)
+  }, [open, initialSubscription])
 
   function handleOpenChange(next: boolean) {
-    if (next) {
-      setForm(emptyForm)
-      setErrors({})
-      setSubmitError(null)
-    }
     onOpenChange(next)
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const result = parseSubscriptionForm(form)
+    const result = parseSubscriptionForm(form, {
+      status: initialSubscription?.status ?? "active",
+    })
     if (!result.ok) {
       setErrors(result.errors)
       return
     }
     setErrors({})
     setSubmitError(null)
+    setSubmitting(true)
     try {
-      await onAdd(result.draft)
+      await onSave(result.draft, initialSubscription?.id ?? null)
       handleOpenChange(false)
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "追加に失敗しました")
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : isEdit
+            ? "保存に失敗しました"
+            : "追加に失敗しました"
+      )
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -118,9 +148,13 @@ export function SubscriptionAddDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md" showCloseButton>
         <DialogHeader>
-          <DialogTitle>サブスクリプションを追加</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "サブスクリプションを編集" : "サブスクリプションを追加"}
+          </DialogTitle>
           <DialogDescription>
-            利用中として登録されます。後から一覧で状態を変更できます。
+            {isEdit
+              ? "変更を保存すると一覧にすぐ反映されます。利用中／アーカイブは一覧のボタンでも切り替えられます。"
+              : "利用中として登録されます。後から一覧で状態を変更できます。"}
           </DialogDescription>
         </DialogHeader>
 
@@ -317,11 +351,20 @@ export function SubscriptionAddDialog({
             <Button
               type="button"
               variant="outline"
+              disabled={submitting}
               onClick={() => handleOpenChange(false)}
             >
               キャンセル
             </Button>
-            <Button type="submit">追加する</Button>
+            <Button type="submit" disabled={submitting}>
+              {submitting
+                ? isEdit
+                  ? "保存中…"
+                  : "追加中…"
+                : isEdit
+                  ? "保存する"
+                  : "追加する"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

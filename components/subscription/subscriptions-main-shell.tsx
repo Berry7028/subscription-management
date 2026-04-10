@@ -12,6 +12,7 @@ type SubscriptionsMainShellProps = {
   sidebar: ReactNode
   subscriptions: Subscription[]
   onRequestAdd: () => void
+  onRequestEdit: (subscription: Subscription) => void
   onSubscriptionStatusChange: (
     id: string,
     status: SubscriptionStatus
@@ -25,6 +26,7 @@ export function SubscriptionsMainShell({
   sidebar,
   subscriptions,
   onRequestAdd,
+  onRequestEdit,
   onSubscriptionStatusChange,
   onSubscriptionDelete,
   statusChangePendingId = null,
@@ -56,6 +58,7 @@ export function SubscriptionsMainShell({
               <SubscriptionListPanel
                 subscriptions={subscriptions}
                 onRequestAdd={onRequestAdd}
+                onRequestEdit={onRequestEdit}
                 onSubscriptionStatusChange={onSubscriptionStatusChange}
                 onSubscriptionDelete={onSubscriptionDelete}
                 statusChangePendingId={statusChangePendingId}

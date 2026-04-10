@@ -205,6 +205,33 @@ export const add = mutation({
   },
 })
 
+export const update = mutation({
+  args: {
+    id: v.id("subscriptions"),
+    ...subscriptionArgs,
+  },
+  handler: async (ctx, { id, ...args }) => {
+    const userId = await requireUserId(ctx)
+    const doc = await ctx.db.get(id)
+    if (!doc || doc.userId !== userId) {
+      throw new Error("サブスクリプションが見つかりません")
+    }
+    assertValidSubscriptionInput(args)
+    const name = args.name.trim()
+    await ctx.db.patch(id, {
+      name,
+      categoryId: args.categoryId,
+      billingInterval: args.billingInterval,
+      amountJpy: args.amountJpy,
+      standardAmountJpy: args.standardAmountJpy,
+      billingDayOfMonth: args.billingDayOfMonth,
+      billingMonth: args.billingMonth,
+      siteUrl: args.siteUrl.trim(),
+      status: args.status,
+    })
+  },
+})
+
 export const setStatus = mutation({
   args: {
     id: v.id("subscriptions"),

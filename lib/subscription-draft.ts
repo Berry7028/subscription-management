@@ -4,6 +4,7 @@ import type {
   BillingInterval,
   Subscription,
   SubscriptionCategoryId,
+  SubscriptionStatus,
 } from "@/types/subscription"
 
 export type SubscriptionDraft = Omit<Subscription, "id">
@@ -53,8 +54,27 @@ function parseBillingInterval(raw: string): BillingInterval | null {
   return null
 }
 
+export function subscriptionToFormInput(
+  sub: Subscription
+): SubscriptionFormInput {
+  return {
+    name: sub.name,
+    categoryId: sub.categoryId,
+    billingInterval: sub.billingInterval,
+    amountJpy: String(sub.amountJpy),
+    standardAmountJpy:
+      sub.standardAmountJpy !== undefined
+        ? String(sub.standardAmountJpy)
+        : "",
+    billingDayOfMonth: String(sub.billingDayOfMonth),
+    billingMonth: String(sub.billingMonth),
+    siteUrl: sub.siteUrl,
+  }
+}
+
 export function parseSubscriptionForm(
-  input: SubscriptionFormInput
+  input: SubscriptionFormInput,
+  options?: { status?: SubscriptionStatus }
 ): { ok: true; draft: SubscriptionDraft } | { ok: false; errors: SubscriptionFormErrors } {
   const errors: SubscriptionFormErrors = {}
 
@@ -154,7 +174,7 @@ export function parseSubscriptionForm(
       billingDayOfMonth,
       billingMonth: month,
       siteUrl,
-      status: "active",
+      status: options?.status ?? "active",
     },
   }
 }

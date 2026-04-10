@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Trash2 } from "lucide-react"
+import { Pencil, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -31,6 +31,7 @@ import type { Subscription, SubscriptionStatus } from "@/types/subscription"
 
 type SubscriptionListRowProps = {
   subscription: Subscription
+  onEdit: (subscription: Subscription) => void
   onStatusChange: (
     id: string,
     status: SubscriptionStatus
@@ -53,6 +54,7 @@ function billingScheduleLabel(sub: Subscription): string {
 
 export function SubscriptionListRow({
   subscription,
+  onEdit,
   onStatusChange,
   onDelete,
   statusChangePending = false,
@@ -124,6 +126,17 @@ export function SubscriptionListRow({
               </span>
             </span>
             <div className="flex flex-wrap items-center justify-end gap-1.5">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                className="shrink-0 text-muted-foreground hover:bg-muted hover:text-foreground"
+                disabled={statusChangePending || deletePending}
+                aria-label={`${name}を編集`}
+                onClick={() => onEdit(subscription)}
+              >
+                <Pencil className="size-3.5" />
+              </Button>
               <Button
                 type="button"
                 variant="ghost"

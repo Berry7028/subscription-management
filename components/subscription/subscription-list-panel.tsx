@@ -10,6 +10,7 @@ import { SubscriptionListRow } from "./subscription-list-row"
 type SubscriptionListPanelProps = {
   subscriptions: Subscription[]
   onRequestAdd: () => void
+  onRequestEdit: (subscription: Subscription) => void
   onSubscriptionStatusChange: (
     id: string,
     status: SubscriptionStatus
@@ -30,6 +31,7 @@ function SectionHeading({ children }: { children: string }) {
 export function SubscriptionListPanel({
   subscriptions,
   onRequestAdd,
+  onRequestEdit,
   onSubscriptionStatusChange,
   onSubscriptionDelete,
   statusChangePendingId = null,
@@ -60,6 +62,7 @@ export function SubscriptionListPanel({
             <SubscriptionListRow
               key={sub.id}
               subscription={sub}
+              onEdit={onRequestEdit}
               onStatusChange={onSubscriptionStatusChange}
               onDelete={onSubscriptionDelete}
               statusChangePending={statusChangePendingId === sub.id}
@@ -76,6 +79,7 @@ export function SubscriptionListPanel({
               <SubscriptionListRow
                 key={sub.id}
                 subscription={sub}
+                onEdit={onRequestEdit}
                 onStatusChange={onSubscriptionStatusChange}
                 onDelete={onSubscriptionDelete}
                 statusChangePending={statusChangePendingId === sub.id}
