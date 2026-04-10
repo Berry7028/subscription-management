@@ -46,6 +46,11 @@ export function BillingCalendarPanel({
     [year, monthIndex]
   )
 
+  const calendarSubscriptions = useMemo(
+    () => subscriptions.filter((s) => s.status === "active"),
+    [subscriptions]
+  )
+
   const today = now
   const isToday = (day: number) =>
     day === today.getDate() &&
@@ -107,7 +112,7 @@ export function BillingCalendarPanel({
 
           const { day } = cell
           const due = subscriptionsBillingOnDay(
-            subscriptions,
+            calendarSubscriptions,
             year,
             monthIndex,
             day
@@ -136,12 +141,7 @@ export function BillingCalendarPanel({
                   {due.slice(0, 2).map((sub) => (
                     <li
                       key={sub.id}
-                      className={cn(
-                        "truncate rounded px-0.5 text-[10px] leading-tight",
-                        sub.status === "active"
-                          ? "bg-primary/15 text-foreground"
-                          : "bg-muted text-muted-foreground line-through decoration-muted-foreground/60"
-                      )}
+                      className="truncate rounded bg-primary/15 px-0.5 text-[10px] leading-tight text-foreground"
                       title={`${sub.name}（毎月${effectiveBillingDay(year, monthIndex, sub.billingDayOfMonth)}日）`}
                     >
                       {sub.name}
@@ -160,7 +160,7 @@ export function BillingCalendarPanel({
       </div>
 
       <p className="sr-only">
-        利用中は強調、解約済みは取り消し線で表示します。日付はその月の実請求日（月末調整あり）です。
+        利用中のサブスクリプションのみ表示します。日付はその月の実請求日（月末調整あり）です。
       </p>
     </div>
   )
