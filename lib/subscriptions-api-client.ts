@@ -81,3 +81,23 @@ export async function setSubscriptionStatusViaApi(
     throw new Error(msg)
   }
 }
+
+export async function deleteSubscriptionViaApi(id: string): Promise<void> {
+  const res = await fetch("/api/subscriptions", {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  })
+  const data = await parseJsonResponse(res)
+  if (!res.ok) {
+    const msg =
+      typeof data === "object" &&
+      data !== null &&
+      "error" in data &&
+      typeof (data as { error: unknown }).error === "string"
+        ? (data as { error: string }).error
+        : "削除に失敗しました"
+    throw new Error(msg)
+  }
+}

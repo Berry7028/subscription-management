@@ -220,6 +220,20 @@ export const setStatus = mutation({
   },
 })
 
+export const remove = mutation({
+  args: {
+    id: v.id("subscriptions"),
+  },
+  handler: async (ctx, { id }) => {
+    const userId = await requireUserId(ctx)
+    const doc = await ctx.db.get(id)
+    if (!doc || doc.userId !== userId) {
+      throw new Error("サブスクリプションが見つかりません")
+    }
+    await ctx.db.delete(id)
+  },
+})
+
 export const seedDemoIfEmpty = mutation({
   args: {},
   handler: async (ctx) => {
