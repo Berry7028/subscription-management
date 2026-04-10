@@ -22,12 +22,12 @@ export function SubscriptionsMainShell({
       defaultValue="list"
       className="flex h-full min-h-0 w-full flex-1 flex-col"
     >
-      <div className="grid h-full min-h-0 w-full flex-1 gap-4 lg:grid-cols-[minmax(0,40%)_minmax(0,1fr)] lg:gap-6">
-        <aside className="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
+      <div className="grid h-full min-h-0 w-full flex-1 items-stretch gap-4 lg:grid-cols-[minmax(0,40%)_minmax(0,1fr)] lg:gap-6">
+        <aside className="flex h-full min-h-0 min-w-0 flex-col gap-3 self-stretch overflow-hidden">
           {sidebar}
         </aside>
 
-        <section className="flex min-h-0 min-w-0 flex-col gap-2 overflow-hidden">
+        <section className="flex h-full min-h-0 min-w-0 flex-col gap-2 self-stretch overflow-hidden">
           <div className="flex shrink-0 justify-end">
             <TabsList aria-label="表示の切り替え">
               <TabsTrigger value="list">リスト</TabsTrigger>
