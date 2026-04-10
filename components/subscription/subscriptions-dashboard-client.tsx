@@ -72,11 +72,11 @@ export function SubscriptionsDashboardClient({
               <Plus className="size-4" />
               サブスクを追加
             </Button>
-            <SubscriptionCategoryChart slices={categorySlices} />
             <MonthlyTotalSummary billedMonthlyJpy={billedMonthlyJpy} />
             <StandardMonthlyEstimateCard
               standardMonthlyJpy={standardMonthlyJpy}
             />
+            <SubscriptionCategoryChart slices={categorySlices} />
           </>
         }
       />
