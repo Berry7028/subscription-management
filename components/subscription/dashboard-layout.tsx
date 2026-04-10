@@ -11,7 +11,7 @@ export function DashboardLayout({ children, className }: DashboardLayoutProps) {
   return (
     <main
       className={cn(
-        "flex min-h-svh w-full max-w-none flex-col px-4 py-8 sm:px-6 lg:px-8 lg:py-10",
+        "flex h-full min-h-0 w-full max-w-none flex-col overflow-hidden px-4 py-3 sm:px-6 lg:px-8 lg:py-4",
         className
       )}
     >

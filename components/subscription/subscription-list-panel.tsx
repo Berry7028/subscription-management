@@ -10,7 +10,7 @@ type SubscriptionListPanelProps = {
 
 function SectionHeading({ children }: { children: string }) {
   return (
-    <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+    <h2 className="mb-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase sm:text-xs">
       {children}
     </h2>
   )
@@ -22,8 +22,8 @@ export function SubscriptionListPanel({
   const { active, archived } = partitionSubscriptionsByStatus(subscriptions)
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-xl border border-border/80 bg-card/40 p-4 ring-1 ring-foreground/5">
-      <ItemGroup className="min-h-0 flex-1 gap-3 overflow-y-auto overscroll-contain">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border/80 bg-card/40 p-3 ring-1 ring-foreground/5 sm:p-4">
+      <ItemGroup className="min-h-0 flex-1 gap-2 overflow-hidden">
         <SectionHeading>利用中</SectionHeading>
         {active.length === 0 ? (
           <p className="text-sm text-muted-foreground">登録がありません</p>

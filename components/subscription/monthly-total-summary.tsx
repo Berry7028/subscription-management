@@ -19,14 +19,14 @@ export function MonthlyTotalSummary({
   caption = "この金額は、あなたの月額料金として請求されます。",
 }: MonthlyTotalSummaryProps) {
   return (
-    <Card>
+    <Card size="sm" className="shrink-0">
       <CardHeader>
         <CardTitle>月額合計</CardTitle>
-        <CardDescription>{caption}</CardDescription>
+        <CardDescription className="line-clamp-2">{caption}</CardDescription>
       </CardHeader>
       <CardContent>
         <p
-          className="font-heading text-3xl font-semibold tracking-tight tabular-nums md:text-4xl"
+          className="font-heading text-2xl font-semibold tracking-tight tabular-nums md:text-3xl"
           aria-live="polite"
         >
           {formatJpy(monthlyTotalJpy)}

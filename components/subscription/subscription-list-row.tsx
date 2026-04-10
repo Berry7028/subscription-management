@@ -19,10 +19,10 @@ export function SubscriptionListRow({
   const { name, amountJpy, billingDayOfMonth, siteUrl, status } = subscription
 
   return (
-    <Item variant="outline" size="default">
-      <ItemHeader className="items-start gap-3 sm:items-center">
+    <Item variant="outline" size="sm">
+      <ItemHeader className="items-start gap-2 sm:items-center sm:gap-3">
         <ItemContent className="min-w-0">
-          <ItemTitle className="text-base">{name}</ItemTitle>
+          <ItemTitle className="text-sm">{name}</ItemTitle>
           <ItemDescription>
             請求日: 毎月{billingDayOfMonth}日
             {status === "archived" ? " · 解約済み" : null}
@@ -38,7 +38,7 @@ export function SubscriptionListRow({
           </ItemDescription>
         </ItemContent>
         <ItemActions className="shrink-0">
-          <span className="text-base font-semibold tabular-nums">
+          <span className="text-sm font-semibold tabular-nums sm:text-base">
             {formatJpy(amountJpy)}
           </span>
         </ItemActions>

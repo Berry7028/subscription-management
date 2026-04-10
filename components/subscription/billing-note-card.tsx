@@ -15,10 +15,10 @@ export function BillingNoteCard({
   body,
 }: BillingNoteCardProps) {
   return (
-    <Card className="border-dashed">
+    <Card size="sm" className="shrink-0 border-dashed">
       <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
-        <CardDescription>{body}</CardDescription>
+        <CardTitle className="text-sm">{title}</CardTitle>
+        <CardDescription className="line-clamp-2">{body}</CardDescription>
       </CardHeader>
     </Card>
   )

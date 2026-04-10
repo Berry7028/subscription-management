@@ -53,9 +53,11 @@ export function BillingCalendarPanel({
     year === today.getFullYear()
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-xl border border-border/80 bg-card/40 p-4 ring-1 ring-foreground/5 lg:p-6">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <h2 className="font-heading text-base font-semibold">{title}</h2>
+    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border/80 bg-card/40 p-3 ring-1 ring-foreground/5 sm:p-4">
+      <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
+        <h2 className="font-heading text-sm font-semibold sm:text-base">
+          {title}
+        </h2>
         <div className="flex items-center gap-1">
           <Button
             type="button"
@@ -83,29 +85,24 @@ export function BillingCalendarPanel({
       </div>
 
       <div
-        className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground"
+        className="grid shrink-0 grid-cols-7 gap-0.5 text-center text-[10px] text-muted-foreground sm:gap-1 sm:text-xs"
         role="row"
       >
         {WEEKDAY_LABELS_JA.map((label) => (
-          <div key={label} className="py-1 font-medium">
+          <div key={label} className="py-0.5 font-medium sm:py-1">
             {label}
           </div>
         ))}
       </div>
 
       <div
-        className="mt-1 grid min-h-0 flex-1 grid-cols-7 gap-1.5 lg:gap-2"
+        className="mt-0.5 grid min-h-0 flex-1 auto-rows-[minmax(0,1fr)] grid-cols-7 gap-0.5 sm:mt-1 sm:gap-1"
         role="grid"
         aria-label="請求日カレンダー"
       >
         {cells.map((cell, i) => {
           if (cell.kind === "empty") {
-            return (
-              <div
-                key={`e-${i}`}
-                className="min-h-14 rounded-md lg:min-h-[clamp(3.25rem,9svh,5.5rem)]"
-              />
-            )
+            return <div key={`e-${i}`} className="min-h-0 rounded-md" />
           }
 
           const { day } = cell
@@ -121,7 +118,7 @@ export function BillingCalendarPanel({
               key={`d-${day}`}
               role="gridcell"
               className={cn(
-                "flex min-h-14 flex-col rounded-md border border-transparent p-1 text-left text-sm transition-colors lg:min-h-[clamp(3.25rem,9svh,5.5rem)] lg:p-1.5",
+                "flex min-h-0 flex-col overflow-hidden rounded-md border border-transparent p-0.5 text-left text-xs transition-colors sm:p-1 sm:text-sm",
                 isToday(day) && "border-primary/40 bg-primary/5",
                 due.length > 0 && "bg-muted/40"
               )}
@@ -162,7 +159,7 @@ export function BillingCalendarPanel({
         })}
       </div>
 
-      <p className="mt-auto pt-3 text-xs text-muted-foreground">
+      <p className="sr-only">
         利用中は強調、解約済みは取り消し線で表示します。日付はその月の実請求日（月末調整あり）です。
       </p>
     </div>
